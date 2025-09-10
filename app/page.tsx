@@ -1,13 +1,13 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Playfair_Display, Lora } from "next/font/google";
+import { Great_Vibes, Dancing_Script } from "next/font/google";
 
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] });
-const lora = Lora({ subsets: ["latin"], weight: ["400", "500"] });
+// Font chữ nghệ thuật, viết tay sang trọng
+const greatVibes = Great_Vibes({ subsets: ["latin"], weight: ["400"] });
+const dancingScript = Dancing_Script({ subsets: ["latin"], weight: ["400", "700"] });
 
 /**
  * Full single-file wedding invitation page
@@ -15,12 +15,13 @@ const lora = Lora({ subsets: ["latin"], weight: ["400", "500"] });
  * - Features:
  *   * Opening letter modal (click to open) -> plays music
  *   * Hero (full 100vh) with overlay, fade/zoom image, slide-up text
+ *   * Quote section with animated carousel of love quotes
  *   * Details section with parallax and countdown + "View Map"
- *   * Notes section (image + small guidelines)
+ *   * Notes section (image + small guidelines) with smooth animation
  *   * Gallery (simple swipe slider for mobile + buttons desktop) with gentle zoom on slide
  *   * RSVP form (modal) with short form and heart animation on success
- *   * Final section with subtle fireworks (CSS) and looping background image
- *   * Floating petals/bubbles background animation
+ *   * Final section with guest messages, subtle fireworks (CSS), and looping background image
+ *   * Floating snow background animation
  *
  * Requires TailwindCSS in the project and Framer Motion available.
  */
@@ -99,6 +100,31 @@ function useTyping(lines: string[], speed = 50, pauseBetween = 900) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
   return output;
+}
+
+/* ---------------------------- Quote carousel ---------------------------- */
+function QuoteCarousel({ quotes }: { quotes: string[] }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % quotes.length);
+    }, 5000); // Chuyển quote sau 5 giây
+    return () => clearInterval(timer);
+  }, [quotes.length]);
+
+  return (
+    <motion.div
+      key={index}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.8 }}
+      className="text-center text-lg text-gray-700 italic"
+    >
+      {quotes[index]}
+    </motion.div>
+  );
 }
 
 /* ---------------------------- Simple Slider (gallery) ---------------------------- */
@@ -265,10 +291,10 @@ export default function Home() {
   // play music when letter opened
   useEffect(() => {
     if (openLetter && audioRef.current) {
-      // try to play; may require user gesture — opening letter counts as click
+      console.log("Đang cố gắng phát nhạc");
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {
-        /* ignore autoplay block */
+      audioRef.current.play().catch((error) => {
+        console.error("Lỗi phát nhạc:", error);
       });
     }
   }, [openLetter]);
@@ -283,10 +309,28 @@ export default function Home() {
     }, 1400);
   };
 
+  // Danh sách các câu quote về tình yêu
+  const loveQuotes = [
+    "🌸 “Tình yêu không làm cho thế giới quay tròn. Tình yêu làm cho chuyến đi trở nên đáng giá.” 💕",
+    "✨ “Bắt đầu từ hôm nay, chúng ta cùng nhau viết tiếp câu chuyện tình yêu của riêng mình.” ✨",
+    "🏡 “Hạnh phúc là khi có ai đó để yêu, có một gia đình để cùng chia sẻ, và có một nơi để gọi là nhà.” 🏡",
+    "🌿 “Cùng nhau già đi sẽ là chuyến phiêu lưu đẹp nhất của cuộc đời.” 🌿",
+    "🎨 “Hôn nhân là bức tranh được vẽ bằng những khoảnh khắc bình dị và yêu thương.” 🎨",
+  ];
+
+  // Danh sách lời nhắn cho khách mời
+  const guestMessages = [
+    "🌸 “Sự hiện diện của bạn chính là niềm hạnh phúc lớn nhất trong ngày trọng đại của chúng tôi.” 🌸",
+    "💖 “Không chỉ là một buổi lễ, đây là ngày chúng tôi muốn chia sẻ niềm vui cùng những người thân yêu nhất.” 💖",
+    "🌺 “Mỗi nụ cười, mỗi lời chúc phúc của bạn sẽ làm ngày cưới của chúng tôi thêm trọn vẹn.” 🌺",
+    "✨ “Hãy đến và cùng nhau tạo nên những kỷ niệm đáng nhớ trong ngày đặc biệt này.” ✨",
+    "🌷 “Một đám cưới không chỉ có hai người, mà còn có tất cả những trái tim yêu thương cùng chung vui.” 🌷",
+  ];
+
   return (
-    <main className={`${lora.className} bg-[#fff8f7] text-gray-800`}>
-      {/* background music (wedding music) */}
-      <audio ref={audioRef} src="/music/wedding-music.mp3" loop />
+    <main className={`${dancingScript.className} bg-[#fff8f7] text-gray-800`}>
+      {/* background music */}
+      <audio ref={audioRef} src="/music.mp3" loop />
       <FloatingDecor />
 
       {/* Opening letter modal */}
@@ -299,7 +343,7 @@ export default function Home() {
             onClick={() => setOpenLetter(true)}
           >
             <Image src="/images/letter.jpg" alt="letter" width={320} height={220} className="rounded-lg" />
-            <h3 className={`${playfair.className} text-2xl mt-4`}>Bạn được mời</h3>
+            <h3 className={`${greatVibes.className} text-2xl mt-4`}>Bạn được mời</h3>
             <p className="mt-2 text-sm text-gray-600">Click để mở thiệp mời</p>
           </motion.div>
         </div>
@@ -336,10 +380,10 @@ export default function Home() {
                 className="text-center max-w-3xl"
               >
                 <p className="text-sm md:text-base text-gray-600 mb-4">Trân trọng kính mời</p>
-                <h1 className={`${playfair.className} text-3xl md:text-6xl leading-tight text-pink-700`}>
+                <h1 className={`${greatVibes.className} text-3xl md:text-6xl leading-tight text-pink-700`}>
                   Kính mời bạn đến dự lễ cưới của chúng tôi
                 </h1>
-                <h2 className={`${playfair.className} text-2xl md:text-4xl mt-6 text-gray-800`}>
+                <h2 className={`${greatVibes.className} text-2xl md:text-4xl mt-6 text-gray-800`}>
                   <span className="block">Trình Trần Phương Tuấn</span>
                   <span className="block text-xl md:text-2xl mt-2">và</span>
                   <span className="block mt-2">Nguyễn Thiên Ân</span>
@@ -375,24 +419,20 @@ export default function Home() {
             </div>
           </section>
 
+          {/* QUOTE section */}
+          <section className="py-12 px-6 md:px-20 bg-[#fff3f6]">
+            <div className="max-w-4xl mx-auto text-center">
+              <h3 className={`${greatVibes.className} text-3xl text-pink-700 mb-6`}>Những lời yêu thương</h3>
+              <QuoteCarousel quotes={loveQuotes} />
+            </div>
+          </section>
+
           {/* DETAILS with parallax & countdown */}
           <section id="details" className="py-12 md:py-24 px-6 md:px-20 bg-white">
             <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
-              <motion.div
-                ref={detailsRef}
-                style={{ transformOrigin: "center" }}
-                className="order-2 md:order-1"
-                initial={{ x: -20, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.9 }}
-              >
-                <div className="rounded-3xl overflow-hidden shadow-lg">
-                  <Image src="/images/anh2.jpeg" alt="hands" width={1200} height={900} className="object-cover w-full h-[56vh]" />
-                </div>
-              </motion.div>
 
               <div className="order-1 md:order-2 text-center md:text-left">
-                <h3 className={`${playfair.className} text-3xl md:text-4xl text-pink-700`}>It's All in the Details</h3>
+                <h3 className={`${greatVibes.className} text-3xl md:text-4xl text-pink-700`}>It's All in the Details</h3>
 
                 <div className="mt-6 text-lg text-gray-700">
                   {/* typing effect lines */}
@@ -445,8 +485,9 @@ export default function Home() {
           <section className="py-12 md:py-20 px-6 md:px-20 bg-[#fff3f6]">
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10">
               <motion.div
-                initial={{ x: -30, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
+                initial={{ scale: 0.95, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
                 className="flex-1"
               >
@@ -458,10 +499,11 @@ export default function Home() {
               <motion.div
                 initial={{ x: 30, opacity: 0 }}
                 whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
                 className="flex-1 text-center md:text-left"
               >
-                <h3 className={`${playfair.className} text-2xl text-pink-700`}>Lưu ý nhẹ nhàng</h3>
+                <h3 className={`${greatVibes.className} text-2xl text-pink-700`}>Lưu ý nhẹ nhàng</h3>
                 <ul className="mt-6 space-y-3 text-gray-700">
                   <li className="flex items-center gap-3">
                     <span className="inline-block animate-bounce">🎉</span>
@@ -483,7 +525,7 @@ export default function Home() {
           {/* GALLERY (slider) */}
           <section className="py-12 md:py-20 px-6 md:px-20 bg-white">
             <div className="max-w-6xl mx-auto text-center">
-              <h3 className={`${playfair.className} text-2xl text-pink-700`}>Album ảnh</h3>
+              <h3 className={`${greatVibes.className} text-2xl text-pink-700`}>Album ảnh</h3>
               <p className="mt-3 text-gray-600">Vuốt để xem - cảm nhận khoảnh khắc</p>
 
               <div className="mt-8">
@@ -507,7 +549,7 @@ export default function Home() {
                   exit={{ scale: 0.9 }}
                   className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6"
                 >
-                  <h4 className={`${playfair.className} text-xl text-pink-700`}>Xác nhận tham dự</h4>
+                  <h4 className={`${greatVibes.className} text-xl text-pink-700`}>Xác nhận tham dự</h4>
                   <form className="mt-4 space-y-3" onSubmit={handleRsvp}>
                     <input required name="name" placeholder="Tên khách mời" className="w-full border px-3 py-2 rounded-lg" />
                     <input required name="count" type="number" min={1} placeholder="Số lượng" className="w-full border px-3 py-2 rounded-lg" />
@@ -534,7 +576,22 @@ export default function Home() {
               <div className="mx-auto w-full md:w-3/4 lg:w-2/3 rounded-3xl overflow-hidden shadow-lg">
                 <Image src="/images/anh6.jpeg" alt="final" width={1600} height={900} className="object-cover w-full h-[50vh]" />
               </div>
-              <h3 className={`${playfair.className} text-3xl mt-8`}>Hẹn gặp lại bạn trong ngày trọng đại của chúng tôi 💖</h3>
+              <h3 className={`${greatVibes.className} text-3xl mt-8 text-pink-700`}>Lời nhắn đến bạn</h3>
+              <div className="mt-6 space-y-4 max-w-2xl mx-auto">
+                {guestMessages.map((message, index) => (
+                  <motion.p
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.2 }}
+                    className="text-lg text-gray-700 italic"
+                  >
+                    {message}
+                  </motion.p>
+                ))}
+              </div>
+              <h3 className={`${greatVibes.className} text-3xl mt-8`}>Hẹn gặp lại bạn trong ngày trọng đại của chúng tôi 💖</h3>
               <p className="mt-4 text-gray-600">Cảm ơn bạn đã là một phần của khoảnh khắc này.</p>
               <div className="mt-8">
                 <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="px-6 py-3 rounded-full bg-pink-600 text-white">
@@ -614,9 +671,9 @@ export default function Home() {
         @media (min-width: 768px) {
           .floating-item { width: 32px; height: 32px; }
         }
-
       `}</style>
     </main>
   );
 }
 
+/* ---------------------------- End of file ---------------------------- */

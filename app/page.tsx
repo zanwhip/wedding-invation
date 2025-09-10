@@ -432,7 +432,7 @@ export default function Home() {
             <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
 
               <div className="order-1 md:order-2 text-center md:text-left">
-                <h3 className={`${greatVibes.className} text-3xl md:text-4xl text-pink-700`}>It's All in the Details</h3>
+                <h3 className={`${greatVibes.className} text-3xl md:text-4xl text-pink-700`}>It is All in the Details</h3>
 
                 <div className="mt-6 text-lg text-gray-700">
                   {/* typing effect lines */}
